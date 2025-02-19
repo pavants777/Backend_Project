@@ -4,6 +4,8 @@ const app = require('../appRoutes');
 const User = require('../models/userModel');
 
 jest.setTimeout(50000); 
+let token = "";
+
 
 describe('User Authentication Tests', () => {
     beforeAll(async () => {
@@ -42,6 +44,18 @@ describe('User Authentication Tests', () => {
 
         expect(res.statusCode).toBe(400);
     })
+
+
+    test("should log in an existing user", async () => {
+        const res = await request(app).post("/api/login").send({
+            email: "testuser@example.com",
+            password: "Test@123",
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toHaveProperty("token");
+        token = res.body.token;
+    });
 
     afterAll(async () => {
         await mongoose.connection.close(); 
