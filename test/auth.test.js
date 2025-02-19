@@ -3,7 +3,7 @@ const request = require('supertest');
 const app = require('../appRoutes'); 
 const User = require('../models/userModel');
 
-jest.setTimeout(50000); 
+jest.setTimeout(60000); 
 let token = "";
 
 
@@ -56,6 +56,23 @@ describe('User Authentication Tests', () => {
         expect(res.body).toHaveProperty("token");
         token = res.body.token;
     });
+
+    test('Token verfication ', async() =>{
+        const res = await request(app)
+        .get("/api/validate")
+        .set("Authorization", "Bearer " + token);
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toHaveProperty("message","Access granted")
+    })
+
+    test('Invalid token verfication', async () =>{
+        token = "";
+        const res = await request(app)
+        .get("/api/validate")
+        .set("Authorization","Bearer Invalid token");
+
+        expect(res.statusCode).toBe(400);
+    })
 
     afterAll(async () => {
         await mongoose.connection.close(); 

@@ -3,6 +3,7 @@ const routes = express.Router();
 const emailValidation = require('../middlewares/emailValidator');
 const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const tokenMiddelWare = require('../middlewares/tokenMiddelwares');
 
 routes.post('/signUp',emailValidation,async (req, res) => {
     try {
@@ -15,11 +16,16 @@ routes.post('/signUp',emailValidation,async (req, res) => {
         await user.save(); 
         const secretKey = process.env.JWT_KEY || "PasswordKey";
         const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '30d' });
-        res.status(200).json({token});
+        const userWithoutPassword = await UserModel.findById(user._id).select("-password");
+        res.status(200).json({message: "Access granted", token , user : userWithoutPassword});
     } catch (error) {
         res.status(500).json({ error: error.message }); 
     }
 });
+
+routes.get('/validate', tokenMiddelWare , (req,res)=>{
+    res.json({ message: "Access granted", user: req.user });
+})
 
 routes.post('/login',emailValidation,async(req,res)=>{
     try {
@@ -35,7 +41,8 @@ routes.post('/login',emailValidation,async(req,res)=>{
         }
         const secretKey = process.env.JWT_KEY || "PasswordKey";
         const token = jwt.sign({userId : existingUser._id}, secretKey, {expiresIn : '30d'});
-        res.status(200).json({token});
+        const userWithoutPassword = await UserModel.findById(user._id).select("-password");
+        res.status(200).json({message: "Access granted", token , user : userWithoutPassword});
     } catch (error) {
         res.status(500).json({error : error.message});
     }
