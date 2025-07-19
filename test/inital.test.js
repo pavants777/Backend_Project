@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 
 jest.setTimeout(20000); 
 
-
 describe('API Testing', () => {
     beforeAll(async () => {
         await mongoose.connect(process.env.DB, {
@@ -12,7 +11,6 @@ describe('API Testing', () => {
             useUnifiedTopology: true,
         });
     });
-
 
     test('Is API running correctly', async () => {
         const res = await request(app).get("/");

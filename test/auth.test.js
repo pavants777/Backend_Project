@@ -6,7 +6,6 @@ const User = require('../models/userModel');
 jest.setTimeout(60000); 
 let token = "";
 
-
 describe('User Authentication Tests', () => {
     beforeAll(async () => {
         try {
